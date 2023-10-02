@@ -1,0 +1,2 @@
+anticaptchaofficial==1.0.56
+python-dotenv==1.0.0
