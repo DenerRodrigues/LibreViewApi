@@ -10,8 +10,8 @@ from src.utils.recaptcha import solve_recaptcha
 
 class LibreViewAPI:
     def __init__(self, api_key=None):
-        self.__api_key = api_key
         self.api_url = settings.API_URL
+        self.__api_key = api_key or self.login()
 
     def login(self):
         print("login")
@@ -26,20 +26,22 @@ class LibreViewAPI:
         response = requests.post(url, json=data)
         json_response = response.json()
 
-        api_token = json_response.get("data", {}).get("authTicket", {}).get("token")
-        print(api_token)
+        api_key = json_response.get("data", {}).get("authTicket", {}).get("token")
+        print(api_key)
 
-        self.send_verification_code_to_email(api_token)
-        result = self.validate_verification_code(api_token)
+        self.send_verification_code_to_email(api_key)
+        result = self.validate_verification_code(api_key)
+
+        self.__api_key = result.get("authTicket", {}).get("token")
 
         return result
 
-    def send_verification_code_to_email(self, api_token):
+    def send_verification_code_to_email(self, api_key):
         print("send code to email")
 
         url = f"{self.api_url}/auth/continue/2fa/sendcode"
         headers = {
-            "Authorization": f"Bearer {api_token}",
+            "Authorization": f"Bearer {api_key}",
         }
 
         data = {"isPrimaryMethod": "true"}
@@ -49,11 +51,11 @@ class LibreViewAPI:
         pprint.pprint(json_response)
         return json_response
 
-    def validate_verification_code(self, api_token):
+    def validate_verification_code(self, api_key):
         print("validate verification code")
 
         url = f"{self.api_url}/auth/continue/2fa/result"
-        headers = {"Authorization": f"Bearer {api_token}"}
+        headers = {"Authorization": f"Bearer {api_key}"}
 
         data = {
             "code": GmailAPI().get_verification_code(),
@@ -63,11 +65,7 @@ class LibreViewAPI:
         response = requests.post(url, json=data, headers=headers)
         json_response = response.json()
         pprint.pprint(json_response)
-        result = json_response.get("data")
-
-        self.__api_key = result.get("authTicket", {}).get("token")
-
-        return result
+        return json_response.get("data")
 
     def dashboard(self):
         print("post dashboard")

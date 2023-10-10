@@ -1,15 +1,16 @@
 from src.services.libreview_api import LibreViewAPI
-from src.utils import web_scraping
+from src.utils.web_scraping import LivreViewWebScraping
 from src import settings
 
 
 if __name__ == "__main__":
     api_key = settings.API_KEY
-    api = LibreViewAPI(api_key)
 
-    if not api_key:
+    if settings.LOGIN_WEB_SCRAPING and not api_key:
+        web_scraping = LivreViewWebScraping()
         api_key = web_scraping.login()
-        api.validate_verification_code(api_key)
+
+    api = LibreViewAPI(api_key)
 
     if settings.DEFAULT_PATIENT_ID:
         patient_ids = [settings.DEFAULT_PATIENT_ID]
