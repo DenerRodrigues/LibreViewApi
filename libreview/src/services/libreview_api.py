@@ -3,13 +3,14 @@ import requests
 import time
 
 from src import settings
+from src.services.gmail_api import GmailAPI
 from src.utils.files import download_file_from_s3
 from src.utils.recaptcha import solve_recaptcha
 
 
 class LibreViewAPI:
-    def __init__(self):
-        self.__api_key = settings.API_KEY
+    def __init__(self, api_key=None):
+        self.__api_key = api_key
         self.api_url = settings.API_URL
 
     def login(self):
@@ -24,8 +25,49 @@ class LibreViewAPI:
 
         response = requests.post(url, json=data)
         json_response = response.json()
+
+        api_token = json_response.get("data", {}).get("authTicket", {}).get("token")
+        print(api_token)
+
+        self.send_verification_code_to_email(api_token)
+        result = self.validate_verification_code(api_token)
+
+        return result
+
+    def send_verification_code_to_email(self, api_token):
+        print("send code to email")
+
+        url = f"{self.api_url}/auth/continue/2fa/sendcode"
+        headers = {
+            "Authorization": f"Bearer {api_token}",
+        }
+
+        data = {"isPrimaryMethod": "true"}
+
+        response = requests.post(url, json=data, headers=headers)
+        json_response = response.json()
         pprint.pprint(json_response)
-        return json_response.get("data")
+        return json_response
+
+    def validate_verification_code(self, api_token):
+        print("validate verification code")
+
+        url = f"{self.api_url}/auth/continue/2fa/result"
+        headers = {"Authorization": f"Bearer {api_token}"}
+
+        data = {
+            "code": GmailAPI().get_verification_code(),
+            "isPrimaryMethod": True,
+        }
+
+        response = requests.post(url, json=data, headers=headers)
+        json_response = response.json()
+        pprint.pprint(json_response)
+        result = json_response.get("data")
+
+        self.__api_key = result.get("authTicket", {}).get("token")
+
+        return result
 
     def dashboard(self):
         print("post dashboard")
