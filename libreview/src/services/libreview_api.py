@@ -141,7 +141,7 @@ class LibreViewAPI:
             if s3_url:
                 break
             else:
-                time.sleep(5)
+                time.sleep(3)
 
         return s3_url
 
