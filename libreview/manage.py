@@ -1,5 +1,5 @@
 from src.services.libreview_api import LibreViewAPI
-from src.utils.web_scraping import LivreViewWebScraping
+from src.utils.web_scraping import LibreViewWebScraping
 from src import settings
 
 
@@ -7,7 +7,7 @@ if __name__ == "__main__":
     api_key = settings.API_KEY
 
     if settings.LOGIN_WEB_SCRAPING and not api_key:
-        web_scraping = LivreViewWebScraping()
+        web_scraping = LibreViewWebScraping()
         api_key = web_scraping.login()
         web_scraping.browser.close()
 

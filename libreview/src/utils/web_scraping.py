@@ -8,7 +8,7 @@ from src import settings
 from src.services.gmail_api import GmailAPI
 
 
-class LivreViewWebScraping:
+class LibreViewWebScraping:
     def __init__(self):
         self.browser = Chrome()
 
