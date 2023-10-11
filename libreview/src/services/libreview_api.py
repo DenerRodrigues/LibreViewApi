@@ -78,6 +78,7 @@ class LibreViewAPI:
             "columns": [
                 "firstName",
                 "lastName",
+                "email",
                 "dob",
                 "lastAvailableData",
                 "avgGlucose",
