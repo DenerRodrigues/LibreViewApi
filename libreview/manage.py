@@ -9,6 +9,7 @@ if __name__ == "__main__":
     if settings.LOGIN_WEB_SCRAPING and not api_key:
         web_scraping = LivreViewWebScraping()
         api_key = web_scraping.login()
+        web_scraping.browser.close()
 
     api = LibreViewAPI(api_key)
 

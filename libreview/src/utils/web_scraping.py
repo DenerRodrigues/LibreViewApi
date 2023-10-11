@@ -20,6 +20,7 @@ class LivreViewWebScraping:
             try:
                 element = self.browser.find_element(By.ID, element_id)
                 if clear:
+                    time.sleep(1)
                     element.clear()
             except:
                 time.sleep(1)
@@ -67,16 +68,16 @@ class LivreViewWebScraping:
         code_input = self._find_element_by_id("twoFactor-step2-code-input", clear=True)
 
         code = GmailAPI().get_verification_code()
-        time.sleep(5)
         
         code_input.send_keys(code)
+        time.sleep(1)
 
         next_button = self._find_element_by_id("twoFactor-step2-next-button")
         self.browser.execute_script("arguments[0].click();", next_button)
 
     def check_code_error(self, resend_code=True):
         try:
-            code_error = self._find_element_by_id("twoFactor-step2-code-input-error-text", max_trying=1)
+            code_error = self._find_element_by_id("twoFactor-step2-code-input-error-text", max_trying=2)
         except:
             code_error = False
 
